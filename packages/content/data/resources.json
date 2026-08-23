@@ -1,0 +1,28 @@
+[
+  {
+    "id": "timber",
+    "name": "Timber",
+    "icon": "logs",
+    "edible": false
+  },
+  {
+    "id": "planks",
+    "name": "Planks",
+    "icon": "planks",
+    "edible": false
+  },
+  {
+    "id": "corn",
+    "name": "Corn",
+    "icon": "corn",
+    "edible": true,
+    "perishability": 1
+  },
+  {
+    "id": "fish",
+    "name": "Fish",
+    "icon": "fish",
+    "edible": true,
+    "perishability": 2
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "smith_corn_1608",
+    "title": "The Indians Bring Us Corn",
+    "author": "John Smith, A True Relation",
+    "year": 1608,
+    "excerpt": "It pleased God (in our extremity) to move the Indians to bring us corn, ere it was half ripe, to refresh us, when we rather expected they would destroy us.",
+    "context": "In the first year at Jamestown the colonists planted little and fished badly. The food that kept them alive came from Powhatan towns along the river, given and traded by people the settlers had come to displace.",
+    "question": "Smith says God moved the Powhatan to bring corn. What reasons might the Powhatan themselves have had? Why might Smith leave those reasons out?"
+  },
+  {
+    "id": "powhatan_to_smith_1609",
+    "title": "Why Will You Take by Force?",
+    "author": "Wahunsenacawh (Powhatan), as recorded by John Smith",
+    "year": 1609,
+    "excerpt": "Why will you take by force that from us which you can have by love? Why will you destroy us who supply you with food?",
+    "context": "Wahunsenacawh led an alliance of some thirty tribes and thousands of people. As the colony grew it demanded more corn than trade could supply, and began taking it. These words survive only because Smith wrote them down.",
+    "question": "This is the most famous thing Wahunsenacawh is said to have spoken, and it reaches us through his opponent's pen. What might change if a Powhatan writer had recorded it instead?"
+  },
+  {
+    "id": "percy_starving_time_1612",
+    "title": "That Sharp Prick of Hunger",
+    "author": "George Percy, A Trewe Relacyon",
+    "year": 1612,
+    "excerpt": "Now all of us at James Town, beginning to feel that sharp prick of hunger, which no man truly describe but he which hath tasted the bitterness thereof.",
+    "context": "Percy was president of the colony through the winter of 1609-1610, remembered as the Starving Time. Of roughly 240 colonists, some 60 were alive when ships arrived the following spring.",
+    "question": "Percy wrote this account years later, to defend how he had led. How could that change what he chose to put in, and what he left out?"
+  }
+]

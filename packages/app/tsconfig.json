@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist-types",
+    "rootDir": ".",
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "noEmit": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
+  "references": [{ "path": "../content" }, { "path": "../sim" }]
+}

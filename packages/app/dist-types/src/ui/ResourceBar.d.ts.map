@@ -1,0 +1,1 @@
+{"version":3,"file":"ResourceBar.d.ts","sourceRoot":"","sources":["../../../src/ui/ResourceBar.tsx"],"names":[],"mappings":"AACA,OAAO,EAAe,KAAK,SAAS,EAAE,MAAM,SAAS,CAAA;AAErD,UAAU,KAAK;IACb,KAAK,EAAE,SAAS,CAAA;IAChB,QAAQ,EAAE,MAAM,CAAA;CACjB;AAED,wBAAgB,WAAW,CAAC,EAAE,KAAK,EAAE,QAAQ,EAAE,EAAE,KAAK,+BAgCrD"}
