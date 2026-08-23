@@ -1,0 +1,59 @@
+[
+  {
+    "id": "felling_camp",
+    "name": "Felling Camp",
+    "description": "Men with axes work the woods. Virginia's timber was the colony's first export, shipped home while the settlers went hungry.",
+    "cost": { "timber": 4 },
+    "buildDays": 3,
+    "workers": 3,
+    "placement": { "terrain": ["forest"] },
+    "production": { "inputs": {}, "outputs": { "timber": 6 }, "intervalDays": 2 },
+    "color": "#6b4a2f"
+  },
+  {
+    "id": "sawpit",
+    "name": "Saw Pit",
+    "description": "Two sawyers, one above and one below, cut logs into planks for building.",
+    "cost": { "timber": 8 },
+    "buildDays": 4,
+    "workers": 2,
+    "placement": { "terrain": ["meadow", "clay"] },
+    "production": { "inputs": { "timber": 4 }, "outputs": { "planks": 2 }, "intervalDays": 2 },
+    "color": "#9c7b4a"
+  },
+  {
+    "id": "fishing_wharf",
+    "name": "Fishing Wharf",
+    "description": "Nets and weirs on the river. The sturgeon run in spring and summer; in winter the river gives up little.",
+    "cost": { "planks": 6, "timber": 4 },
+    "buildDays": 4,
+    "workers": 3,
+    "placement": { "terrain": ["meadow", "clay"], "adjacentTerrain": ["water"] },
+    "production": { "inputs": {}, "outputs": { "fish": 8 }, "intervalDays": 2 },
+    "sourceCard": "smith_corn_1608",
+    "color": "#4a7f9c"
+  },
+  {
+    "id": "dwelling",
+    "name": "Dwelling",
+    "description": "A timber-framed house with a thatched roof. Shelter kept colonists working through the cold months.",
+    "cost": { "planks": 6, "timber": 2 },
+    "buildDays": 3,
+    "workers": 0,
+    "placement": { "terrain": ["meadow", "clay"] },
+    "housing": 5,
+    "color": "#b5893f"
+  },
+  {
+    "id": "storehouse",
+    "name": "Storehouse",
+    "description": "The common store. What it held in October decided who was alive in March.",
+    "cost": { "planks": 10, "timber": 6 },
+    "buildDays": 5,
+    "workers": 1,
+    "placement": { "terrain": ["meadow", "clay"] },
+    "storage": 250,
+    "sourceCard": "percy_starving_time_1612",
+    "color": "#8c6239"
+  }
+]

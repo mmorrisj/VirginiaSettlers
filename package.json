@@ -1,0 +1,20 @@
+{
+  "name": "virginia-settlers",
+  "private": true,
+  "version": "0.0.0",
+  "description": "An educational settlement-building game set at Jamestown, 1607-1622.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @vs/app",
+    "build": "tsc -b && npm run build -w @vs/app",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b --force"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  }
+}

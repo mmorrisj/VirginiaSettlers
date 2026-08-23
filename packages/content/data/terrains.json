@@ -1,0 +1,7 @@
+[
+  { "id": "water",  "name": "James River", "buildable": false, "passable": false, "color": "#3f6f9c" },
+  { "id": "marsh",  "name": "Marsh",       "buildable": false, "passable": true,  "color": "#5d7a56" },
+  { "id": "forest", "name": "Forest",      "buildable": true,  "passable": true,  "color": "#2f5d3a" },
+  { "id": "meadow", "name": "Meadow",      "buildable": true,  "passable": true,  "color": "#8aa05a" },
+  { "id": "clay",   "name": "Clay Bank",   "buildable": true,  "passable": true,  "color": "#a87550" }
+]
