@@ -7,6 +7,7 @@ import { BuildMenu } from './ui/BuildMenu.js'
 import { Journal } from './ui/Journal.js'
 import { ResourceBar } from './ui/ResourceBar.js'
 import { SourceCardModal } from './ui/SourceCardModal.js'
+import { TradePanel } from './ui/TradePanel.js'
 import { TileInspector } from './ui/TileInspector.js'
 
 const SCENARIO_ID = 'jamestown_1607'
@@ -126,6 +127,7 @@ export function App() {
           <MapView
             world={state.world}
             buildings={state.buildings}
+            towns={state.towns}
             ghost={ghost}
             onHover={setHovered}
             onSelect={onSelectTile}
@@ -134,6 +136,7 @@ export function App() {
 
         <aside className="sidebar">
           <BuildMenu state={state} selected={selectedBuilding} onSelect={setSelectedBuilding} />
+          <TradePanel state={state} onCommand={execute} />
           <TileInspector state={state} tile={hovered} onDemolish={onDemolish} />
           <Journal entries={state.log} />
         </aside>

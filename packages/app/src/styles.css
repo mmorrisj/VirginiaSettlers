@@ -157,3 +157,68 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .source-attribution { margin: 0 0 1rem; color: var(--ink-muted); }
 .source-context { line-height: 1.5; }
 .source-question { line-height: 1.5; background: #2a2013; border-radius: 4px; padding: 0.7rem 0.9rem; }
+
+/* --- Neighbours ------------------------------------------------------------ */
+
+.panel-intro { font-size: 0.9rem; margin-top: -0.2rem; }
+
+.town-card {
+  border: 1px solid var(--edge);
+  border-left: 4px solid var(--edge);
+  border-radius: 5px;
+  padding: 0.6rem 0.7rem;
+  margin-top: 0.6rem;
+  background: #1a242c;
+}
+.town-card.band-hostile { border-left-color: var(--danger); }
+.town-card.band-wary { border-left-color: #b8863f; }
+.town-card.band-cordial { border-left-color: #6f9c5a; }
+.town-card.band-allied { border-left-color: var(--good); }
+
+.town-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+
+.band-badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.band-badge.band-hostile { color: var(--danger); }
+.band-badge.band-wary { color: #d3a45c; }
+.band-badge.band-cordial { color: #8fc47a; }
+.band-badge.band-allied { color: var(--good); }
+
+.relationship-bar {
+  height: 6px;
+  background: #0f171d;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0.45rem 0;
+}
+.relationship-bar span { display: block; height: 100%; background: var(--accent); }
+.band-hostile .relationship-bar span { background: var(--danger); }
+.band-cordial .relationship-bar span { background: #8fc47a; }
+.band-allied .relationship-bar span { background: var(--good); }
+
+.town-line { margin: 0.25rem 0; font-size: 0.92rem; }
+
+.offer-row { display: flex; gap: 0.4rem; align-items: center; margin: 0.5rem 0 0.35rem; flex-wrap: wrap; }
+.offer-row select {
+  font: inherit;
+  color: inherit;
+  background: var(--panel-raised);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 0.3rem 0.4rem;
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+.steps { display: flex; gap: 0.2rem; }
+.steps button { padding: 0.25rem 0.5rem; font-size: 0.88rem; }
+
+.quote { margin: 0.35rem 0 0.55rem; font-size: 0.92rem; line-height: 1.4; }
+
+.town-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.town-actions button { font-size: 0.88rem; padding: 0.35rem 0.6rem; }

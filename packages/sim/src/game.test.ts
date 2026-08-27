@@ -287,6 +287,25 @@ describe('the chapter is playable', () => {
     expect(wharfSites).toBeGreaterThanOrEqual(6)
   })
 
+  it('offers somewhere to put every building in the game', () => {
+    // A building with no legal site is invisible content: the player never sees
+    // it, and any build order that waits on it stalls silently. This caught a
+    // bog iron pit that had exactly one site on the whole map.
+    const game = newGame()
+    game.state.stores['timber'] = 9999
+    game.state.stores['planks'] = 9999
+
+    for (const building of content.buildingList) {
+      let sites = 0
+      for (let y = 0; y < game.state.world.height; y++) {
+        for (let x = 0; x < game.state.world.width; x++) {
+          if (placementError(game.state, content, building.id, x, y) === null) sites++
+        }
+      }
+      expect(sites, `no room for ${building.id} on the ${SCENARIO} map`).toBeGreaterThanOrEqual(4)
+    }
+  })
+
   it('can be won by a player who fishes and builds shelter', () => {
     const game = newGame()
     playCompetently(game, 6)

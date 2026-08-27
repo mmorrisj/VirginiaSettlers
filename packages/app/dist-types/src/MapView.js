@@ -2,7 +2,7 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { useEffect, useRef } from 'react';
 import { content } from '@vs/content';
 import { MapRenderer } from './renderer.js';
-export function MapView({ world, buildings, ghost, onHover, onSelect }) {
+export function MapView({ world, buildings, towns, ghost, onHover, onSelect }) {
     const hostRef = useRef(null);
     const rendererRef = useRef(null);
     // Callbacks change every render; route them through refs so the expensive
@@ -27,6 +27,8 @@ export function MapView({ world, buildings, ghost, onHover, onSelect }) {
             }
             renderer = created;
             rendererRef.current = created;
+            created.setBuildings(buildings);
+            created.setTowns(towns);
         });
         return () => {
             cancelled = true;
@@ -36,6 +38,9 @@ export function MapView({ world, buildings, ghost, onHover, onSelect }) {
     }, [world]);
     useEffect(() => {
         rendererRef.current?.setBuildings(buildings);
+    });
+    useEffect(() => {
+        rendererRef.current?.setTowns(towns);
     });
     useEffect(() => {
         rendererRef.current?.setGhost(ghost);

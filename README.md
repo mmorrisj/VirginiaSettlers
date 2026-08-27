@@ -17,22 +17,55 @@ npm run typecheck
 npm run build
 ```
 
-## What is here (milestone M0)
+## What is here
 
-A complete vertical slice of the machinery, with one chapter's worth of content:
+**M0 — the machinery.**
 
 - A **deterministic simulation** — seasons, labour, production chains, food,
   starvation, exposure, win and loss.
-- Five buildings forming a real chain: felling camp → saw pit → planks →
-  wharves and dwellings.
 - A **generated map** of the James River peninsula, identical for every player
   of the same chapter.
-- **Primary source cards** that stop the clock when a building reveals one.
+- **Primary source cards** that stop the clock when one is revealed.
 - A colony journal, save/load by action replay, and speed controls.
 
-The chapter is winnable and losable, and both are covered by tests: a player who
-builds four wharves loses nobody, one who builds two survives at the cost of a
-third of the colony, and one who builds nothing dies by day 196.
+**M1 — the Powhatan.** The colony no longer feeds itself out of its own stores
+and the river alone. Corn cannot be farmed; it comes from the towns, or it does
+not come at all.
+
+- Three **Powhatan towns** on the map — Paspahegh, Quiyoughcohanock and
+  Werowocomoco — each with its own harvest, its own appetite, and its own view
+  of the colony.
+- A **relationship** from hostile to allied that sets the exchange rate and
+  decides whether a town will deal at all.
+- Three ways to get corn: **trade**, **give** (goodwill, no corn), and **take by
+  force** (corn now, ruin later). A trading party is on the road for days, so
+  winter has to be planned for.
+- The towns' granaries fill at the autumn harvest and run down over the year.
+  The chapter opens in high summer, at their leanest — which is the situation
+  the settlers actually landed into.
+- A new production chain to trade with: bog iron pit → forge → tools.
+
+The chapter has several honest routes through and pins them all with tests
+(see **Balance** below).
+
+## Balance
+
+Measured against the reference players in the test suite, for the same colony
+and the same buildings:
+
+| Fishing wharves | Trading honestly | Taking by force |
+|---|---|---|
+| 2 | 24 alive, none lost | 7 alive, **17 lost** |
+| 3 | 24 alive, none lost | 15 alive, 9 lost |
+| 4 | 24 alive, none lost | 20 alive, 4 lost |
+
+Taking corn works on the day. What it costs is the trade the colony depends on
+and, worse, the safety of the ground outside the palisade: colonists who cannot
+leave the fort cannot fish. That is what the siege of 1609 did to Jamestown, and
+it is why a colony that takes has to over-invest in fishing just to break even.
+
+Building nothing at all still loses the colony by day 196. All of this is pinned
+by tests, so a balance change that breaks it fails CI.
 
 ## Architecture
 

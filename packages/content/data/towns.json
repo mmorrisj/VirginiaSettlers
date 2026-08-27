@@ -1,0 +1,38 @@
+[
+  {
+    "id": "paspahegh",
+    "name": "Paspahegh",
+    "description": "The nearest town, whose land the fort was built on without asking. They deal with the colony because it is close, not because they welcome it.",
+    "position": { "x": 0.55, "y": 0.18 },
+    "travelDays": 3,
+    "startingRelationship": 45,
+    "harvestCorn": 380,
+    "dailyUse": 1,
+    "wants": { "copper": 10, "tools": 26 },
+    "color": "#c9772f"
+  },
+  {
+    "id": "quiyoughcohanock",
+    "name": "Quiyoughcohanock",
+    "description": "Across the river and a little downstream. Willing traders in a good year, and the first to close their granaries in a bad one.",
+    "position": { "x": 0.62, "y": 0.62 },
+    "travelDays": 5,
+    "startingRelationship": 55,
+    "harvestCorn": 450,
+    "dailyUse": 1,
+    "wants": { "copper": 12, "tools": 30 },
+    "color": "#c9a22f"
+  },
+  {
+    "id": "werowocomoco",
+    "name": "Werowocomoco",
+    "description": "Wahunsenacawh's own town, seat of an alliance of some thirty tribes. The richest granaries on the river, and the most to lose by giving them away.",
+    "position": { "x": 0.30, "y": 0.88 },
+    "travelDays": 8,
+    "startingRelationship": 50,
+    "harvestCorn": 700,
+    "dailyUse": 2,
+    "wants": { "copper": 14, "tools": 34 },
+    "color": "#b8452f"
+  }
+]

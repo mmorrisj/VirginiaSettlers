@@ -1,7 +1,14 @@
-import type { Content, Scenario } from '@vs/content'
-import { COLONISTS_PER_FOOD_UNIT } from './balance.js'
+import type { Content, Scenario, Town } from '@vs/content'
+import {
+  BAND_RATE_PERCENT,
+  COLONISTS_PER_FOOD_UNIT,
+  HARVEST_DAY_OF_YEAR,
+  RELATIONSHIP_BANDS,
+  type RelationshipBand,
+} from './balance.js'
+import { DAYS_PER_YEAR } from './calendar.js'
 import { Rng } from './rng.js'
-import { generateWorld, neighbours, terrainAt, type World } from './world.js'
+import { generateWorld, inBounds, neighbours, terrainAt, type World } from './world.js'
 
 export type LogKind = 'info' | 'good' | 'warning' | 'death' | 'source'
 
@@ -29,6 +36,23 @@ export interface PlacedBuilding {
   idle: IdleReason
 }
 
+/** The colony's standing with one Powhatan town, and what it has going on there. */
+export interface TownState {
+  id: string
+  x: number
+  y: number
+  /** Goodwill, 0-100. */
+  relationship: number
+  /** Corn the town currently has to spare. */
+  cornStock: number
+  /** Day a trading party returns, or null when nobody is away. */
+  partyReturnsOn: number | null
+  /** Corn that party is bringing back. */
+  incomingCorn: number
+  /** Last day the colony dealt with this town, for the journal. */
+  lastContactDay: number | null
+}
+
 export type Outcome =
   | { status: 'playing' }
   | { status: 'survived'; day: number }
@@ -41,6 +65,7 @@ export interface GameState {
   world: World
   buildings: PlacedBuilding[]
   nextBuildingId: number
+  towns: TownState[]
   stores: Record<string, number>
   /** Lifetime totals produced, for the colony journal and end-of-chapter report. */
   produced: Record<string, number>
@@ -75,6 +100,7 @@ export function createInitialState(content: Content, scenario: Scenario): GameSt
     world,
     buildings: [],
     nextBuildingId: 1,
+    towns: content.townList.map((town) => createTownState(town, world, scenario)),
     stores,
     produced,
     colonists: scenario.startingColonists,
@@ -88,6 +114,134 @@ export function createInitialState(content: Content, scenario: Scenario): GameSt
 }
 
 /** Total storage the colony can hold, including completed storehouses. */
+/**
+ * Places a town on the map and works out how much corn it has left. The chapter
+ * opens in high summer, months after the last harvest and before the next, so
+ * the towns are at their leanest exactly when the colony first needs them —
+ * which is the situation the settlers actually landed into.
+ */
+function createTownState(town: Town, world: World, scenario: Scenario): TownState {
+  const { x, y } = nearestLandTile(
+    world,
+    Math.round(town.position.x * (world.width - 1)),
+    Math.round(town.position.y * (world.height - 1)),
+  )
+
+  const dayOfYear = scenario.startDay % DAYS_PER_YEAR
+  const sinceHarvest =
+    dayOfYear >= HARVEST_DAY_OF_YEAR
+      ? dayOfYear - HARVEST_DAY_OF_YEAR
+      : dayOfYear + (DAYS_PER_YEAR - HARVEST_DAY_OF_YEAR)
+
+  return {
+    id: town.id,
+    x,
+    y,
+    relationship: town.startingRelationship,
+    cornStock: Math.max(0, town.harvestCorn - town.dailyUse * sinceHarvest),
+    partyReturnsOn: null,
+    incomingCorn: 0,
+    lastContactDay: null,
+  }
+}
+
+/** Spiral out from a target tile until we find dry land to put a town on. */
+function nearestLandTile(world: World, targetX: number, targetY: number): { x: number; y: number } {
+  const isLand = (x: number, y: number) => {
+    const terrain = terrainAt(world, x, y)
+    return terrain !== undefined && terrain !== 'water'
+  }
+  if (isLand(targetX, targetY)) return { x: targetX, y: targetY }
+
+  for (let radius = 1; radius < Math.max(world.width, world.height); radius++) {
+    for (let dy = -radius; dy <= radius; dy++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== radius) continue
+        const x = targetX + dx
+        const y = targetY + dy
+        if (inBounds(world, x, y) && isLand(x, y)) return { x, y }
+      }
+    }
+  }
+  return { x: 0, y: 0 }
+}
+
+export function relationshipBand(relationship: number): RelationshipBand {
+  let band: RelationshipBand = 'hostile'
+  for (const entry of RELATIONSHIP_BANDS) {
+    if (relationship >= entry.min) band = entry.band
+  }
+  return band
+}
+
+export function townState(state: GameState, townId: string): TownState | undefined {
+  return state.towns.find((town) => town.id === townId)
+}
+
+/**
+ * Corn an offer would fetch at this town today. The town's own valuation of the
+ * goods, scaled by how it currently regards the colony — never by what the
+ * colony thinks the goods are worth.
+ */
+export function offerValue(
+  town: Town,
+  relationship: number,
+  offer: Record<string, number>,
+): number {
+  const percent = BAND_RATE_PERCENT[relationshipBand(relationship)]
+  let value = 0
+  for (const [resourceId, quantity] of Object.entries(offer)) {
+    const cordialRate = town.wants[resourceId]
+    if (cordialRate === undefined) continue
+    value += Math.floor((cordialRate * quantity * percent) / 100)
+  }
+  return value
+}
+
+export interface TradeQuote {
+  /** Goods the town will actually take. */
+  accepted: Record<string, number>
+  /** Corn those goods fetch. */
+  corn: number
+}
+
+/**
+ * What a town will really give for an offer today. A town does not take twenty
+ * hatchets for the eighty corn left in its granary: it accepts what it can pay
+ * for and hands the rest back. The UI shows this quote before the player
+ * commits, so nobody discovers the exchange rate by losing a winter's tools.
+ */
+export function quoteTrade(
+  town: Town,
+  relationship: number,
+  offer: Record<string, number>,
+  cornAvailable: number,
+): TradeQuote {
+  const percent = BAND_RATE_PERCENT[relationshipBand(relationship)]
+  const accepted: Record<string, number> = {}
+  let corn = 0
+  let remaining = Math.max(0, cornAvailable)
+
+  // Sorted so the quote is identical however the offer object was built.
+  for (const resourceId of Object.keys(offer).sort()) {
+    const quantity = offer[resourceId] ?? 0
+    const cordialRate = town.wants[resourceId]
+    if (quantity <= 0 || cordialRate === undefined) continue
+
+    const rate = Math.floor((cordialRate * percent) / 100)
+    if (rate <= 0) continue
+
+    const take = Math.min(quantity, Math.floor(remaining / rate))
+    if (take <= 0) continue
+
+    accepted[resourceId] = take
+    corn += take * rate
+    remaining -= take * rate
+  }
+
+  return { accepted, corn }
+}
+
 export function storageCapacity(state: GameState, content: Content, scenario: Scenario): number {
   let capacity = scenario.baseStorage
   for (const building of state.buildings) {

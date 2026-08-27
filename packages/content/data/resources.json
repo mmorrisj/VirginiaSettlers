@@ -24,5 +24,26 @@
     "icon": "fish",
     "edible": true,
     "perishability": 2
+  },
+  {
+    "id": "copper",
+    "name": "Copper",
+    "icon": "copper",
+    "edible": false,
+    "perishability": 0
+  },
+  {
+    "id": "iron",
+    "name": "Bog Iron",
+    "icon": "iron",
+    "edible": false,
+    "perishability": 0
+  },
+  {
+    "id": "tools",
+    "name": "Tools",
+    "icon": "tools",
+    "edible": false,
+    "perishability": 0
   }
 ]

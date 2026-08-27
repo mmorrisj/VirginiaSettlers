@@ -40,6 +40,36 @@ So the relationship is a mechanic:
 This is better history and a better game: it produces real tension instead of a
 resource treadmill.
 
+## How the Powhatan relationship works (M1)
+
+Each town keeps a goodwill score from 0 to 100, shown to the player as a band:
+
+| Band | Range | What it means |
+|---|---|---|
+| hostile | 0–19 | Will not trade. Makes the ground outside the fort unsafe. |
+| wary | 20–44 | Will trade, at 60% of the going rate. |
+| cordial | 45–74 | Will trade at the full rate. |
+| allied | 75–100 | Will trade at 135%. |
+
+- **Trade** sends goods out and brings corn back after a journey of several
+  days. A town accepts only as much as it can pay for and hands the rest back,
+  and the quote is shown before the player commits — nobody should learn the
+  exchange rate by losing a winter's tools.
+- **Give** buys goodwill and no corn. It is the only way back from hostility,
+  because a hostile town refuses to trade at all.
+- **Take by force** brings corn home immediately and costs 25 goodwill. It is
+  what the colony's leaders actually did.
+
+Goodwill also slips by one point every twenty days no matter what the player
+does. A fort on their land is a standing grievance, and the game should not
+pretend otherwise.
+
+Hostility is not only a closed market. Each hostile town cuts the colony's food
+production, because colonists who cannot safely leave the palisade cannot fish
+or forage. Without this, taking by force was strictly free within a chapter —
+the first version of M1 gave the honest trader and the raider identical
+outcomes, which made the whole system decorative.
+
 ## Chapters
 
 | Chapter | Year | The problem |
