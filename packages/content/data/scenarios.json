@@ -12,9 +12,10 @@
       "timber": 24,
       "planks": 18,
       "corn": 900,
-      "fish": 0
+      "fish": 0,
+      "copper": 60
     },
-    "baseStorage": 1200,
+    "baseStorage": 1400,
     "startDay": 120
   }
 ]

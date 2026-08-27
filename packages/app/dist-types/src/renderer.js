@@ -1,4 +1,4 @@
-import { Application, Container, Graphics } from 'pixi.js';
+import { Application, Container, Graphics, Text } from 'pixi.js';
 export const TILE_SIZE = 26;
 /**
  * Draws the colony. Deliberately knows nothing about React or about the rules:
@@ -12,6 +12,8 @@ export class MapRenderer {
     app = new Application();
     terrainLayer = new Graphics();
     buildingLayer = new Graphics();
+    townLayer = new Graphics();
+    townLabels = new Container();
     overlayLayer = new Graphics();
     hovered = null;
     ghost = null;
@@ -43,7 +45,7 @@ export class MapRenderer {
             return;
         }
         const scene = new Container();
-        scene.addChild(this.terrainLayer, this.buildingLayer, this.overlayLayer);
+        scene.addChild(this.terrainLayer, this.buildingLayer, this.townLayer, this.townLabels, this.overlayLayer);
         this.app.stage.addChild(scene);
         this.app.canvas.classList.add('map-canvas');
         parent.appendChild(this.app.canvas);
@@ -110,6 +112,43 @@ export class MapRenderer {
                 // A small red pip beats a wall of text for a nine-year-old scanning the map.
                 this.buildingLayer.circle(x + size - 3, y + 3, 3).fill('#e05a4a');
             }
+        }
+    }
+    /**
+     * Powhatan towns. Drawn as ringed markers rather than square buildings so it
+     * reads at a glance that these are neighbours, not colony property.
+     */
+    setTowns(towns) {
+        this.townLayer.clear();
+        this.townLabels.removeChildren();
+        for (const town of towns) {
+            const definition = this.content.towns.get(town.id);
+            if (!definition)
+                continue;
+            const cx = town.x * TILE_SIZE + TILE_SIZE / 2;
+            const cy = town.y * TILE_SIZE + TILE_SIZE / 2;
+            this.townLayer
+                .circle(cx, cy, TILE_SIZE * 0.42)
+                .fill(definition.color)
+                .stroke({ color: '#241a10', width: 2 });
+            this.townLayer.circle(cx, cy, TILE_SIZE * 0.18).fill('#241a10');
+            // A party on the road gets a halo, so the map shows what the colony is
+            // waiting on without opening a panel.
+            if (town.partyReturnsOn !== null) {
+                this.townLayer.circle(cx, cy, TILE_SIZE * 0.66).stroke({ color: '#f0d27a', width: 2 });
+            }
+            const label = new Text({
+                text: definition.name,
+                style: {
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 11,
+                    fill: '#f2e9d8',
+                    stroke: { color: '#14202b', width: 3 },
+                },
+            });
+            label.anchor.set(0.5, 0);
+            label.position.set(cx, cy + TILE_SIZE * 0.5);
+            this.townLabels.addChild(label);
         }
     }
     setGhost(ghost) {

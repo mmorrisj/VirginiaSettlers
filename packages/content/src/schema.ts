@@ -83,6 +83,33 @@ export const sourceCardSchema = z.object({
   question: z.string(),
 })
 
+/**
+ * A Powhatan town the colony can deal with. These are not player buildings and
+ * cannot be built, captured or destroyed: they are neighbours with their own
+ * harvest, their own needs, and their own view of the newcomers.
+ */
+export const townSchema = z.object({
+  id,
+  name: z.string(),
+  description: z.string(),
+  /** Where the town sits, as a fraction of the map's width and height. */
+  position: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }),
+  /** Days a trading party spends on the round trip. */
+  travelDays: z.number().int().positive(),
+  /** Relationship at the start of the chapter, 0-100. */
+  startingRelationship: z.number().int().min(0).max(100),
+  /** Corn the town has to spare when its harvest comes in. */
+  harvestCorn: z.number().int().nonnegative(),
+  /** Corn the town itself eats each day, which is why late winter is lean. */
+  dailyUse: z.number().int().nonnegative().default(2),
+  /**
+   * What the town will trade for, and how much corn one unit fetches when the
+   * relationship is cordial. Their regard for the goods, not ours.
+   */
+  wants: z.record(id, z.number().int().positive()),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+})
+
 export const scenarioSchema = z.object({
   id,
   name: z.string(),
@@ -103,6 +130,7 @@ export const contentSchema = z.object({
   terrains: z.array(terrainSchema),
   resources: z.array(resourceSchema),
   buildings: z.array(buildingSchema),
+  towns: z.array(townSchema),
   sourceCards: z.array(sourceCardSchema),
   scenarios: z.array(scenarioSchema),
 })
@@ -111,6 +139,7 @@ export type Terrain = z.infer<typeof terrainSchema>
 export type Resource = z.infer<typeof resourceSchema>
 export type Building = z.infer<typeof buildingSchema>
 export type Production = z.infer<typeof productionSchema>
+export type Town = z.infer<typeof townSchema>
 export type SourceCard = z.infer<typeof sourceCardSchema>
 export type Scenario = z.infer<typeof scenarioSchema>
 export type RawContent = z.input<typeof contentSchema>

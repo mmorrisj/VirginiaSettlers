@@ -2,6 +2,10 @@ import type { Content, Scenario } from '@vs/content'
 import {
   COLONISTS_PER_FOOD_UNIT,
   CONSTRUCTION_CREW,
+  HARVEST_DAY_OF_YEAR,
+  HOSTILITY_FOOD_PENALTY_PERCENT,
+  MAX_HOSTILITY_FOOD_PENALTY_PERCENT,
+  RELATIONSHIP_DRIFT_DAYS,
   FOOD_YIELD_BY_SEASON,
   MAX_LOG_ENTRIES,
   STARVATION_DEATH_RATE,
@@ -13,6 +17,7 @@ import { dateFrom, formatDate } from './calendar.js'
 import { Rng } from './rng.js'
 import {
   housingCapacity,
+  relationshipBand,
   storageCapacity,
   totalStored,
   type GameState,
@@ -43,6 +48,7 @@ export function tick(state: GameState, content: Content, scenario: Scenario): vo
   allocateLabour(state, content)
   advanceConstruction(state, content)
   produce(state, content, scenario, date.season)
+  advanceTowns(state, content, scenario, date.dayOfYear)
   const fed = consumeFood(state, content)
   applyHunger(state, fed)
   applyExposure(state, content, rng, date.season)
@@ -96,7 +102,7 @@ function advanceConstruction(state: GameState, content: Content): void {
   }
 }
 
-function revealSourceCard(state: GameState, content: Content, cardId: string | undefined): void {
+export function revealSourceCard(state: GameState, content: Content, cardId: string | undefined): void {
   if (!cardId || state.discoveredSourceCards.includes(cardId)) return
   const card = content.sourceCards.get(cardId)
   if (!card) return
@@ -104,8 +110,79 @@ function revealSourceCard(state: GameState, content: Content, cardId: string | u
   log(state, 'source', `A record comes to light: "${card.title}" (${card.author}, ${card.year}).`)
 }
 
+/**
+ * The towns live their own year: the harvest comes in at the start of autumn,
+ * they eat from it daily, and by late summer their granaries are low. Trading
+ * parties come home on their appointed day carrying whatever they were given.
+ */
+function advanceTowns(
+  state: GameState,
+  content: Content,
+  scenario: Scenario,
+  dayOfYear: number,
+): void {
+  const capacity = storageCapacity(state, content, scenario)
+
+  for (const town of state.towns) {
+    const definition = content.towns.get(town.id)
+    if (!definition) continue
+
+    if (dayOfYear === HARVEST_DAY_OF_YEAR) {
+      town.cornStock = definition.harvestCorn
+      if (town === state.towns[0]) {
+        log(state, 'info', 'The harvest is in along the river. The towns have corn to spare again.')
+      }
+    } else {
+      town.cornStock = Math.max(0, town.cornStock - definition.dailyUse)
+    }
+
+    if (town.partyReturnsOn !== null && state.day >= town.partyReturnsOn) {
+      const free = Math.max(0, capacity - totalStored(state))
+      const delivered = Math.min(town.incomingCorn, free)
+      state.stores['corn'] = (state.stores['corn'] ?? 0) + delivered
+
+      if (delivered > 0) {
+        log(state, 'good', `The party returns from ${definition.name} with ${delivered} corn.`)
+      } else if (town.incomingCorn > 0) {
+        log(state, 'warning', `The party returns from ${definition.name}, but the store is full.`)
+      } else {
+        log(state, 'info', `The party returns from ${definition.name} empty-handed.`)
+      }
+
+      town.partyReturnsOn = null
+      town.incomingCorn = 0
+    }
+
+    // A fort on their land is a standing grievance, whatever else the colony does.
+    if (state.day % RELATIONSHIP_DRIFT_DAYS === 0) {
+      const wasHostile = relationshipBand(town.relationship) === 'hostile'
+      town.relationship = Math.max(0, town.relationship - 1)
+      if (!wasHostile && relationshipBand(town.relationship) === 'hostile') {
+        log(state, 'warning', `${definition.name} has turned against the colony.`)
+      }
+    }
+  }
+
+  if (hostilityFoodPenalty(state) > 0 && state.day % RELATIONSHIP_DRIFT_DAYS === 0) {
+    log(state, 'warning', 'The colonists dare not work the river. Less food comes in.')
+  }
+}
+
+/**
+ * How much food production is lost to hostile neighbours. Colonists who cannot
+ * safely leave the palisade cannot work the river.
+ */
+export function hostilityFoodPenalty(state: GameState): number {
+  const hostile = state.towns.filter((town) => relationshipBand(town.relationship) === 'hostile')
+  return Math.min(
+    MAX_HOSTILITY_FOOD_PENALTY_PERCENT,
+    hostile.length * HOSTILITY_FOOD_PENALTY_PERCENT,
+  )
+}
+
 function produce(state: GameState, content: Content, scenario: Scenario, season: string): void {
   const capacity = storageCapacity(state, content, scenario)
+  const foodPenalty = hostilityFoodPenalty(state)
 
   for (const building of state.buildings) {
     if (!building.complete) continue
@@ -126,7 +203,12 @@ function produce(state: GameState, content: Content, scenario: Scenario, season:
     const producesFood = Object.keys(recipe.outputs).some(
       (resourceId) => content.resources.get(resourceId)?.edible,
     )
-    const seasonPercent = producesFood ? (FOOD_YIELD_BY_SEASON[season] ?? PROGRESS_SCALE) : PROGRESS_SCALE
+    const seasonPercent = producesFood
+      ? Math.floor(
+          ((FOOD_YIELD_BY_SEASON[season] ?? PROGRESS_SCALE) * (PROGRESS_SCALE - foodPenalty)) /
+            PROGRESS_SCALE,
+        )
+      : PROGRESS_SCALE
 
     building.progress += Math.floor((staffPercent * seasonPercent) / PROGRESS_SCALE)
     building.idle = null

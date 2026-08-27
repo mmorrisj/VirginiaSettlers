@@ -1,5 +1,5 @@
 import type { Content } from '@vs/content';
-import type { PlacedBuilding, World } from '@vs/sim';
+import type { PlacedBuilding, TownState, World } from '@vs/sim';
 export declare const TILE_SIZE = 26;
 export interface RendererCallbacks {
     onHover(tile: {
@@ -23,6 +23,8 @@ export declare class MapRenderer {
     private readonly app;
     private readonly terrainLayer;
     private readonly buildingLayer;
+    private readonly townLayer;
+    private readonly townLabels;
     private readonly overlayLayer;
     private hovered;
     private ghost;
@@ -33,6 +35,11 @@ export declare class MapRenderer {
     private toTile;
     private drawTerrain;
     setBuildings(buildings: readonly PlacedBuilding[]): void;
+    /**
+     * Powhatan towns. Drawn as ringed markers rather than square buildings so it
+     * reads at a glance that these are neighbours, not colony property.
+     */
+    setTowns(towns: readonly TownState[]): void;
     setGhost(ghost: {
         valid: boolean;
     } | null): void;

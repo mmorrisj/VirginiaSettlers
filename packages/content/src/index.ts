@@ -1,10 +1,11 @@
 import terrains from '../data/terrains.json'
 import resources from '../data/resources.json'
 import buildings from '../data/buildings.json'
+import towns from '../data/towns.json'
 import sourceCards from '../data/source-cards.json'
 import scenarios from '../data/scenarios.json'
 import { contentSchema } from './schema.js'
-import type { Building, Resource, Scenario, SourceCard, Terrain } from './schema.js'
+import type { Building, Resource, Scenario, SourceCard, Terrain, Town } from './schema.js'
 
 export * from './schema.js'
 
@@ -17,12 +18,14 @@ export interface Content {
   terrains: ReadonlyMap<string, Terrain>
   resources: ReadonlyMap<string, Resource>
   buildings: ReadonlyMap<string, Building>
+  towns: ReadonlyMap<string, Town>
   sourceCards: ReadonlyMap<string, SourceCard>
   scenarios: ReadonlyMap<string, Scenario>
   /** Insertion-ordered lists, for menus that need a stable display order. */
   buildingList: readonly Building[]
   resourceList: readonly Resource[]
   scenarioList: readonly Scenario[]
+  townList: readonly Town[]
 }
 
 const byId = <T extends { id: string }>(items: readonly T[]): ReadonlyMap<string, T> =>
@@ -36,11 +39,13 @@ export function loadContent(raw: unknown): Content {
     terrains: byId(parsed.terrains),
     resources: byId(parsed.resources),
     buildings: byId(parsed.buildings),
+    towns: byId(parsed.towns),
     sourceCards: byId(parsed.sourceCards),
     scenarios: byId(parsed.scenarios),
     buildingList: parsed.buildings,
     resourceList: parsed.resources,
     scenarioList: parsed.scenarios,
+    townList: parsed.towns,
   }
 
   assertReferencesResolve(content)
@@ -82,6 +87,19 @@ function assertReferencesResolve(content: Content): void {
     }
   }
 
+  for (const town of content.townList) {
+    const where = `town "${town.id}"`
+    checkResources(`${where} wants`, town.wants)
+    if (Object.keys(town.wants).length === 0) {
+      problems.push(`${where}: must want at least one trade good, or it can never be dealt with`)
+    }
+    for (const resourceId of Object.keys(town.wants)) {
+      if (content.resources.get(resourceId)?.edible) {
+        problems.push(`${where}: wants "${resourceId}", but trading food for food is not a bargain`)
+      }
+    }
+  }
+
   for (const scenario of content.scenarioList) {
     const where = `scenario "${scenario.id}"`
     checkResources(`${where} startingResources`, scenario.startingResources)
@@ -107,6 +125,7 @@ export const content: Content = loadContent({
   terrains,
   resources,
   buildings,
+  towns,
   sourceCards,
   scenarios,
 })

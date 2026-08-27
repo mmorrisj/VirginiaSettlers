@@ -1,18 +1,19 @@
 import { useEffect, useRef } from 'react'
 import { content } from '@vs/content'
-import type { PlacedBuilding, World } from '@vs/sim'
+import type { PlacedBuilding, TownState, World } from '@vs/sim'
 import { MapRenderer } from './renderer.js'
 
 interface Props {
   world: World
   buildings: readonly PlacedBuilding[]
+  towns: readonly TownState[]
   /** Null when no building is selected; otherwise whether the hovered tile is legal. */
   ghost: { valid: boolean } | null
   onHover: (tile: { x: number; y: number } | null) => void
   onSelect: (tile: { x: number; y: number }) => void
 }
 
-export function MapView({ world, buildings, ghost, onHover, onSelect }: Props) {
+export function MapView({ world, buildings, towns, ghost, onHover, onSelect }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const rendererRef = useRef<MapRenderer | null>(null)
 
@@ -40,6 +41,8 @@ export function MapView({ world, buildings, ghost, onHover, onSelect }: Props) {
       }
       renderer = created
       rendererRef.current = created
+      created.setBuildings(buildings)
+      created.setTowns(towns)
     })
 
     return () => {
@@ -51,6 +54,10 @@ export function MapView({ world, buildings, ghost, onHover, onSelect }: Props) {
 
   useEffect(() => {
     rendererRef.current?.setBuildings(buildings)
+  })
+
+  useEffect(() => {
+    rendererRef.current?.setTowns(towns)
   })
 
   useEffect(() => {

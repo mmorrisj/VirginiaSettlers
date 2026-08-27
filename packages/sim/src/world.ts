@@ -67,10 +67,12 @@ export function generateWorld(scenario: Scenario, rng: Rng): World {
       if (distanceToRiver <= 0) {
         terrain = 'water'
       } else if (distanceToRiver === 1) {
-        // The shoreline alternates between soft marsh and workable clay.
-        terrain = value < 0.45 ? 'marsh' : 'clay'
-      } else if (distanceToRiver <= 3 && value < 0.32) {
-        terrain = 'marsh'
+        // A mostly firm bank at the water's edge: this is where wharves go.
+        terrain = value < 0.3 ? 'marsh' : 'clay'
+      } else if (distanceToRiver <= 4) {
+        // Behind the bank lies the marsh the peninsula was known for, and the
+        // bog iron dug out of its edges.
+        terrain = value < 0.5 ? 'marsh' : value > 0.72 ? 'meadow' : 'forest'
       } else if (value > 0.58) {
         terrain = 'meadow'
       } else {

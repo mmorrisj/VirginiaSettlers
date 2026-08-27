@@ -23,6 +23,7 @@ describe('content', () => {
       loadContent({
         terrains: [{ id: 'meadow', name: 'Meadow', buildable: true, passable: true, color: '#000000' }],
         resources: [{ id: 'timber', name: 'Timber', icon: 'logs' }],
+        towns: [],
         buildings: [
           {
             id: 'mill',
@@ -43,6 +44,7 @@ describe('content', () => {
       loadContent({
         terrains: [{ id: 'meadow', name: 'Meadow', buildable: true, passable: true, color: '#000000' }],
         resources: [],
+        towns: [],
         buildings: [
           {
             id: 'mill',
@@ -79,6 +81,7 @@ describe('scenario coherence', () => {
       loadContent({
         terrains: [],
         resources: [{ id: 'corn', name: 'Corn', icon: 'corn', edible: true }],
+        towns: [],
         buildings: [],
         sourceCards: [],
         scenarios: [
